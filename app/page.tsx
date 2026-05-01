@@ -1,14 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import {
-  ArrowUpRight,
-  Mail,
-  MapPin,
-  Code2,
-} from "lucide-react";
+import { ArrowUpRight, Mail, MapPin, Code2 } from "lucide-react";
 
 const basePath = process.env.NODE_ENV === "production" ? "/Mahip-Parekh" : "";
 
@@ -119,6 +114,118 @@ function LinkedInIcon({ size = 16 }: { size?: number }) {
   );
 }
 
+function BitsToLettersCard() {
+  const finalText = "Mahip Parekh";
+  const cardRef = useRef<HTMLDivElement | null>(null);
+
+  const binaryText = useMemo(
+    () =>
+      finalText
+        .split("")
+        .map((char) =>
+          char === " "
+            ? " "
+            : char.charCodeAt(0).toString(2).padStart(8, "0")
+        ),
+    []
+  );
+
+  const [revealedCount, setRevealedCount] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const element = cardRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setRevealedCount(0);
+          setIsVisible(true);
+        } else {
+          setIsVisible(false);
+        }
+      },
+      {
+        threshold: 0.45,
+      }
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const interval = setInterval(() => {
+      setRevealedCount((count) => {
+        if (count >= finalText.length) {
+          clearInterval(interval);
+          return count;
+        }
+
+        return count + 1;
+      });
+    }, 180);
+
+    return () => clearInterval(interval);
+  }, [isVisible, finalText.length]);
+
+  return (
+    <div
+      ref={cardRef}
+      className="mt-10 max-w-xl rounded-[2rem] border border-zinc-200 bg-white/60 p-5 shadow-sm backdrop-blur"
+    >
+      <div className="mb-4">
+        <p className="text-xs font-medium uppercase tracking-[0.22em] text-zinc-400">
+          Data to meaning
+        </p>
+        <h3 className="mt-2 text-lg font-semibold text-zinc-950">
+          From bits to identity
+        </h3>
+      </div>
+
+      <div className="rounded-2xl border border-zinc-200 bg-zinc-950 p-4 font-mono text-sm text-zinc-100">
+        <div className="mb-3 flex items-center gap-2 text-xs text-zinc-500">
+          <span className="h-2 w-2 rounded-full bg-zinc-500" />
+          <span>encoding.profile</span>
+        </div>
+
+        <div className="flex flex-wrap gap-x-2 gap-y-2 leading-7">
+          {finalText.split("").map((char, index) => {
+            const isSpace = char === " ";
+            const isRevealed = index < revealedCount;
+
+            if (isSpace) {
+              return <span key={index} className="w-3" />;
+            }
+
+            return (
+              <span
+                key={index}
+                className={`inline-block rounded-md px-1.5 py-0.5 transition-all duration-300 ${
+                  isRevealed
+                    ? "bg-white text-zinc-950"
+                    : "bg-zinc-900 text-zinc-500"
+                }`}
+              >
+                {isRevealed ? char : binaryText[index]}
+              </span>
+            );
+          })}
+        </div>
+      </div>
+
+      <p className="mt-4 text-sm leading-6 text-zinc-500">
+        A quiet systems-inspired detail: raw bits become readable information,
+        just like software turns structure into experience.
+      </p>
+    </div>
+  );
+}
+
 type SectionHeaderProps = {
   eyebrow: string;
   title: string;
@@ -151,18 +258,18 @@ export default function PortfolioLandingPage() {
         </div>
       </nav>
 
-      <section id="top" className="mx-auto max-w-6xl px-5 pb-20 pt-8 md:px-8 md:pt-16">
-        <motion.div className="max-w-4xl" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-        <div className="mb-8 h-36 w-36 overflow-hidden rounded-[2rem] border border-zinc-200 bg-zinc-200 shadow-xl shadow-zinc-300/50">
-  <Image
-  src={`${basePath}/images/profile.jpg`}
-  alt="Mahip Parekh"
-  width={144}
-  height={144}
-  className="h-full w-full object-cover"
-  priority
-/>
-</div>
+      <section id="top" className="mx-auto grid max-w-6xl gap-10 px-5 pb-20 pt-8 md:grid-cols-[0.95fr_1.05fr] md:px-8 md:pt-16">
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+          <div className="mb-8 h-36 w-36 overflow-hidden rounded-[2rem] border border-zinc-200 bg-zinc-200 shadow-xl shadow-zinc-300/50">
+            <Image
+              src={`${basePath}/images/profile.jpg`}
+              alt="Mahip Parekh"
+              width={144}
+              height={144}
+              className="h-full w-full object-cover"
+              priority
+            />
+          </div>
           <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-zinc-300 bg-white/55 px-4 py-2 text-sm text-zinc-600 shadow-sm backdrop-blur">
             <MapPin size={15} /> {profile.location}
           </p>
@@ -178,6 +285,10 @@ export default function PortfolioLandingPage() {
               Contact me
             </a>
           </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.12 }}>
+          <BitsToLettersCard />
         </motion.div>
       </section>
 
