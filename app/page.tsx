@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import {
   ArrowUpRight,
   Mail,
@@ -150,11 +151,16 @@ export default function PortfolioLandingPage() {
 
       <section id="top" className="mx-auto max-w-6xl px-5 pb-20 pt-8 md:px-8 md:pt-16">
         <motion.div className="max-w-4xl" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-          <div className="mb-8 h-36 w-36 overflow-hidden rounded-[2rem] border border-zinc-200 bg-zinc-200 shadow-xl shadow-zinc-300/50">
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-200 to-zinc-400 text-4xl font-semibold text-zinc-700">
-              MP
-            </div>
-          </div>
+        <div className="mb-8 h-36 w-36 overflow-hidden rounded-[2rem] border border-zinc-200 bg-zinc-200 shadow-xl shadow-zinc-300/50">
+  <Image
+    src="/images/profile.jpg"
+    alt="Mahip Parekh"
+    width={144}
+    height={144}
+    className="h-full w-full object-cover"
+    priority
+  />
+</div>
           <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-zinc-300 bg-white/55 px-4 py-2 text-sm text-zinc-600 shadow-sm backdrop-blur">
             <MapPin size={15} /> {profile.location}
           </p>
